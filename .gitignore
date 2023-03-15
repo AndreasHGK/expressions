@@ -1,0 +1,9 @@
+# IDEs
+.idea/
+.fleet/
+
+# OS
+.DS_Store
+
+# Rust
+/target

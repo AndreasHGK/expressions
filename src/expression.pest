@@ -1,0 +1,23 @@
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+LITERAL    = @{ ( ASCII_ALPHANUMERIC | "." | "," | "_" )+ }
+
+root       = _{ SOI ~ expression ~ EOI }
+expression = { binary_op }
+
+group     = { DELIM_L ~ expression ~ DELIM_R }
+    DELIM_L = { "(" }
+    DELIM_R = { ")" }
+simple    = _{ unary_op | LITERAL | group }
+binary_op = _{ simple ~ (binary_operator ~ simple)* }
+    binary_operator = _{ ADD | SUB | MUL | DIV | MOD | EXP }
+        ADD   = { "+" }
+        SUB   = { "-" }
+        MUL   = { "*" }
+        DIV   = { "/" }
+        MOD   = { "%" }
+        EXP   = { "^" }
+unary_op  = _{ unary_operator ~ simple }
+    unary_operator = _{ PLUS | MINUS | NOT }
+        PLUS  = { "+" }
+        MINUS = { "-" }
+        NOT   = { "!" }

@@ -1,0 +1,18 @@
+[package]
+name = "expressions"
+version = "1.0.0"
+edition = "2021"
+authors = ["andreashgk"]
+description = "Flexible expression parser and evaluator"
+repository = "https://github.com/andreashgk/expressions/"
+license = "MIT"
+keywords = ["expression", "eval", "math"]
+categories = ["mathematics", "parser-implementations"]
+exclude = [".github/"]
+
+[dependencies]
+lazy_static = "1.4.0"
+pest = "2.5.6"
+pest_derive = "2.5.6"
+thiserror = "1.0.38"
+
