@@ -1,0 +1,42 @@
+name: Cargo Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - name: Cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --all-features
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --examples --tests --all-features
