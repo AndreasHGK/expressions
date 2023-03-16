@@ -17,9 +17,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
     - name: Cache
       uses: actions/cache@v3
       with:
@@ -31,12 +28,6 @@ jobs:
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --all-features
+      run: cargo build --all-features
     - name: Run tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --examples --tests --all-features
+      run: cargo test --examples --tests
