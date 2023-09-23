@@ -9,7 +9,7 @@ pub use eval::eval;
 #[cfg(test)]
 mod tests {
     use crate::ast::{BinaryOp, BinaryOpType, Expression, Span, Spanned};
-    use crate::eval::{eval, Eval, EvalError, IntEvalError};
+    use crate::eval::{eval, EvalError, IntEvalError};
     use crate::parser::parse;
 
     #[test]
@@ -39,14 +39,25 @@ mod tests {
         try_eval!(i32, 2 * 2 * 2 * 2 * 2 * 2 * 2);
         try_eval!(i32, 2 * 2 * 2 - (2 * 2 * 2) * 2);
         try_eval!(i32, 100 / 2 + 29 % 2 % 2);
-        assert_eq!(
-            eval::<i32>("2 ^ 3 ^ 1 + 4").unwrap(),
-            2i32.exp(3.exp(1).unwrap()).unwrap() + 4,
-        );
-        assert_eq!(
-            eval::<i32>("2 ^ 3 ^ (1 + 1)").unwrap(),
-            2i32.exp(3.exp(1 + 1).unwrap()).unwrap(),
-        );
+        assert_eq!(eval::<i32>("2 ^ 3 ^ 1 + 4").unwrap(), 12);
+        assert_eq!(eval::<i32>("2 ^ 3 ^ (1 + 1)").unwrap(), 512);
+
+        assert_eq!(eval::<i32>("1 == 2").unwrap(), 0);
+        assert_eq!(eval::<i32>("1 == 0 == 0").unwrap(), 1);
+        assert_eq!(eval::<i32>("324 < 324 + 1").unwrap(), 1);
+        assert_eq!(eval::<i32>("324 - 1 <= 323").unwrap(), 1);
+        assert_eq!(eval::<i32>("234 && 123").unwrap(), 1);
+        assert_eq!(eval::<i32>("1 && 0").unwrap(), 0);
+        assert_eq!(eval::<i32>("1 || 0").unwrap(), 1);
+        assert_eq!(eval::<i32>("1 && (0 || 1)").unwrap(), 1);
+        assert_eq!(eval::<i32>("~~ ~~345").unwrap(), !!!!345);
+        assert_eq!(eval::<i32>("!! !!345").unwrap(), 1);
+        try_eval!(i32, 1 | 2 | 10);
+        try_eval!(i32, 1 & 2 | 10);
+        assert_eq!(eval::<i32>("1 < 1").unwrap(), 0);
+        assert_eq!(eval::<i32>("1 <= 1").unwrap(), 1);
+        assert_eq!(eval::<i32>("1 <= 2").unwrap(), 1);
+        assert_eq!(eval::<i32>("1 <= -2").unwrap(), 0);
     }
 
     #[test]

@@ -9,15 +9,26 @@ group     = { DELIM_L ~ expression ~ DELIM_R }
     DELIM_R = { ")" }
 simple    = _{ unary_op | LITERAL | group }
 binary_op = _{ simple ~ (binary_operator ~ simple)* }
-    binary_operator = _{ ADD | SUB | MUL | DIV | MOD | EXP }
-        ADD   = { "+" }
-        SUB   = { "-" }
-        MUL   = { "*" }
-        DIV   = { "/" }
-        MOD   = { "%" }
-        EXP   = { "^" }
+    binary_operator = _{ EQ | NEQ | GTE | GT | LTE | LT | AND | OR | BIT_AND | BIT_OR | ADD | SUB | MUL | DIV | MOD | EXP }
+        EQ      = { "==" }
+        NEQ     = { "!=" }
+        GTE     = { ">=" }
+        GT      = { ">" }
+        LTE     = { "<=" }
+        LT      = { "<" }
+        AND     = { "&&" }
+        OR      = { "||" }
+        BIT_AND = { "&" }
+        BIT_OR  = { "|" }
+        ADD     = { "+" }
+        SUB     = { "-" }
+        MUL     = { "*" }
+        DIV     = { "/" }
+        MOD     = { "%" }
+        EXP     = { "^" }
 unary_op  = _{ unary_operator ~ simple }
-    unary_operator = _{ PLUS | MINUS | NOT }
-        PLUS  = { "+" }
-        MINUS = { "-" }
-        NOT   = { "!" }
+    unary_operator = _{ PLUS | MINUS | NOT | BIT_NOT }
+        PLUS    = { "+" }
+        MINUS   = { "-" }
+        NOT     = { "!" }
+        BIT_NOT = { "~" }

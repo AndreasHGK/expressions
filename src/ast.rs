@@ -84,6 +84,16 @@ impl<T: Eval> BinaryOp<T> {
         let val2 = self.operand2.eval()?;
 
         match self.operator.deref() {
+            BinaryOpType::Eq => val1.eq(val2),
+            BinaryOpType::Neq => val1.neq(val2),
+            BinaryOpType::Gte => val1.gte(val2),
+            BinaryOpType::Gt => val1.gt(val2),
+            BinaryOpType::Lte => val1.lte(val2),
+            BinaryOpType::Lt => val1.lt(val2),
+            BinaryOpType::And => val1.and(val2),
+            BinaryOpType::Or => val1.or(val2),
+            BinaryOpType::BitAnd => val1.bit_and(val2),
+            BinaryOpType::BitOr => val1.bit_or(val2),
             BinaryOpType::Add => val1.add(val2),
             BinaryOpType::Sub => val1.sub(val2),
             BinaryOpType::Mul => val1.mul(val2),
@@ -118,6 +128,26 @@ impl<T: Eval + PartialEq> PartialEq for BinaryOp<T> {
 /// The kind of binary operation. Examples of such types are addition or subtraction.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BinaryOpType {
+    /// `a == b`
+    Eq,
+    /// `a != b`
+    Neq,
+    /// `a >= b`
+    Gte,
+    /// `a > b`
+    Gt,
+    /// `a <= b`
+    Lte,
+    /// `a < b`
+    Lt,
+    /// `a && b`
+    And,
+    /// `a || b`
+    Or,
+    /// `a & b`
+    BitAnd,
+    /// `a | b`
+    BitOr,
     /// `a + b`
     Add,
     /// `a - b`
@@ -152,6 +182,7 @@ impl<T: Eval> UnaryOp<T> {
             UnaryOpType::Plus => val.plus(),
             UnaryOpType::Minus => val.minus(),
             UnaryOpType::Not => val.not(),
+            UnaryOpType::BitNot => val.bit_not(),
         }
     }
 
@@ -176,6 +207,8 @@ pub enum UnaryOpType {
     Minus,
     /// `!a`
     Not,
+    /// `~a`
+    BitNot,
 }
 
 /// A span denotes an character interval in the source expression string.

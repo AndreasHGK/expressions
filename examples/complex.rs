@@ -55,6 +55,52 @@ pub enum ComplexEvalErr {
 impl Eval for Complex {
     type ErrEval = ComplexEvalErr;
 
+    fn eq(self, other: Self) -> Result<Self, Self::ErrEval> {
+        match self == other {
+            true => Ok(Self::new(1., 0.)),
+            false => Ok(Self::new(0., 0.)),
+        }
+    }
+
+    fn neq(self, other: Self) -> Result<Self, Self::ErrEval> {
+        match self != other {
+            true => Ok(Self::new(1., 0.)),
+            false => Ok(Self::new(0., 0.)),
+        }
+    }
+
+    fn gte(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn gt(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn lte(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn lt(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn and(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn or(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn bit_and(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn bit_or(self, _other: Self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
     fn add(self, other: Self) -> Result<Self, Self::ErrEval> {
         Ok(Self {
             real: self.real + other.real,
@@ -104,6 +150,10 @@ impl Eval for Complex {
     }
 
     fn not(self) -> Result<Self, Self::ErrEval> {
+        Err(ComplexEvalErr::OperatorNotSupported)
+    }
+
+    fn bit_not(self) -> Result<Self, Self::ErrEval> {
         Err(ComplexEvalErr::OperatorNotSupported)
     }
 }
@@ -171,7 +221,9 @@ fn main() {
     loop {
         print!("Input: ");
         stdout().flush().expect("could not flush stdout");
-        stdin().read_line(&mut buf).expect("could not read from stdin: ");
+        stdin()
+            .read_line(&mut buf)
+            .expect("could not read from stdin: ");
 
         match eval::<Complex>(&buf) {
             Ok(val) => println!("Result: {}", val),

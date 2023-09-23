@@ -61,6 +61,16 @@ impl From<Error<Rule>> for SyntaxError {
                     Rule::LITERAL => Some("literal"),
                     Rule::expression => Some("expression"),
 
+                    Rule::EQ => Some("'=='"),
+                    Rule::NEQ => Some("'!='"),
+                    Rule::GTE => Some("'>='"),
+                    Rule::GT => Some("'>'"),
+                    Rule::LTE => Some("'<='"),
+                    Rule::LT => Some("'<'"),
+                    Rule::AND => Some("'&&'"),
+                    Rule::OR => Some("'||'"),
+                    Rule::BIT_AND => Some("'&'"),
+                    Rule::BIT_OR => Some("'|'"),
                     Rule::ADD => Some("'+'"),
                     Rule::SUB => Some("'-'"),
                     Rule::MUL => Some("'*'"),
@@ -71,6 +81,7 @@ impl From<Error<Rule>> for SyntaxError {
                     Rule::PLUS => Some("'+'"),
                     Rule::MINUS => Some("'-'"),
                     Rule::NOT => Some("'!'"),
+                    Rule::BIT_NOT => Some("'~'"),
 
                     Rule::DELIM_L => Some("'('"),
                     Rule::DELIM_R => Some("')'"),
@@ -115,12 +126,24 @@ lazy_static! {
     /// every time it is needed.
     static ref PARSER: PrattParser<Rule> = {
         PrattParser::new()
+            .op(
+                Op::infix(Rule::EQ, Assoc::Left)
+                | Op::infix(Rule::NEQ, Assoc::Left)
+                | Op::infix(Rule::GTE, Assoc::Left)
+                | Op::infix(Rule::GT, Assoc::Left)
+                | Op::infix(Rule::LTE, Assoc::Left)
+                | Op::infix(Rule::LT, Assoc::Left)
+            )
+            .op(Op::infix(Rule::AND, Assoc::Left) | Op::infix(Rule::OR, Assoc::Left))
+            .op(Op::infix(Rule::BIT_AND, Assoc::Left) | Op::infix(Rule::BIT_OR, Assoc::Left))
             .op(Op::infix(Rule::ADD, Assoc::Left) | Op::infix(Rule::SUB, Assoc::Left))
-            .op(Op::infix(Rule::MUL, Assoc::Left)
+            .op(
+                Op::infix(Rule::MUL, Assoc::Left)
                 | Op::infix(Rule::DIV, Assoc::Left)
-                | Op::infix(Rule::MOD, Assoc::Left))
+                | Op::infix(Rule::MOD, Assoc::Left)
+            )
             .op(Op::infix(Rule::EXP, Assoc::Right))
-            .op(Op::prefix(Rule::PLUS) | Op::prefix(Rule::MINUS) | Op::prefix(Rule::NOT))
+            .op(Op::prefix(Rule::PLUS) | Op::prefix(Rule::MINUS) | Op::prefix(Rule::NOT) | Op::prefix(Rule::BIT_NOT))
     };
 }
 
@@ -146,6 +169,16 @@ fn parse_expression<T: Eval>(input: Pairs<Rule>) -> Result<Expression<T>, ParseE
                 operand2: right?,
                 operator: Spanned::new(
                     match op.as_rule() {
+                        Rule::EQ => BinaryOpType::Eq,
+                        Rule::NEQ => BinaryOpType::Neq,
+                        Rule::GTE => BinaryOpType::Gte,
+                        Rule::GT => BinaryOpType::Gt,
+                        Rule::LTE => BinaryOpType::Lte,
+                        Rule::LT => BinaryOpType::Lt,
+                        Rule::AND => BinaryOpType::And,
+                        Rule::OR => BinaryOpType::Or,
+                        Rule::BIT_AND => BinaryOpType::BitAnd,
+                        Rule::BIT_OR => BinaryOpType::BitOr,
                         Rule::ADD => BinaryOpType::Add,
                         Rule::SUB => BinaryOpType::Sub,
                         Rule::MUL => BinaryOpType::Mul,
@@ -166,6 +199,7 @@ fn parse_expression<T: Eval>(input: Pairs<Rule>) -> Result<Expression<T>, ParseE
                         Rule::PLUS => UnaryOpType::Plus,
                         Rule::MINUS => UnaryOpType::Minus,
                         Rule::NOT => UnaryOpType::Not,
+                        Rule::BIT_NOT => UnaryOpType::BitNot,
                         _ => unreachable!(),
                     },
                     prefix.as_span().into(),

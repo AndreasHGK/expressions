@@ -38,6 +38,27 @@ pub trait Eval: EvalParse + Clone {
     /// expression.
     type ErrEval: Error + PartialEq;
 
+    /// An operation of the form: `a == b`.
+    fn eq(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a != b`.
+    fn neq(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a >= b`.
+    fn gte(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a > b`.
+    fn gt(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a <= b`.
+    fn lte(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a < b`.
+    fn lt(self, other: Self) -> Result<Self, Self::ErrEval>;
+
+    /// An operation of the form: `a && b`.
+    fn and(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a || b`.
+    fn or(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a & b`.
+    fn bit_and(self, other: Self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `a | b`.
+    fn bit_or(self, other: Self) -> Result<Self, Self::ErrEval>;
     /// An operation of the form: `a + b`.
     fn add(self, other: Self) -> Result<Self, Self::ErrEval>;
     /// An operation of the form: `a - b`.
@@ -57,6 +78,8 @@ pub trait Eval: EvalParse + Clone {
     fn minus(self) -> Result<Self, Self::ErrEval>;
     /// An operation of the form: `!a`.
     fn not(self) -> Result<Self, Self::ErrEval>;
+    /// An operation of the form: `~a`.
+    fn bit_not(self) -> Result<Self, Self::ErrEval>;
 }
 
 /// A trait to allow a literal to be parsed, guaranteeing that the error implements [Error] +
@@ -86,6 +109,70 @@ macro_rules! eval_int {
     ($i:ty) => {
         impl Eval for $i {
             type ErrEval = IntEvalError;
+
+            fn eq(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self == other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn neq(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self != other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn gte(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self >= other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn gt(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self > other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn lte(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self <= other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn lt(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self < other {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn and(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match (self != 0) && (other != 0) {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn or(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match (self != 0) || (other != 0) {
+                    true => Ok(1),
+                    false => Ok(0),
+                }
+            }
+
+            fn bit_and(self, other: Self) -> Result<Self, Self::ErrEval> {
+                Ok(self & other)
+            }
+
+            fn bit_or(self, other: Self) -> Result<Self, Self::ErrEval> {
+                Ok(self | other)
+            }
 
             fn add(self, other: Self) -> Result<Self, Self::ErrEval> {
                 self.checked_add(other).ok_or(IntEvalError::Overflow)
@@ -121,6 +208,13 @@ macro_rules! eval_int {
             }
 
             fn not(self) -> Result<Self, Self::ErrEval> {
+                match self {
+                    0 => Ok(1),
+                    _ => Ok(0),
+                }
+            }
+
+            fn bit_not(self) -> Result<Self, Self::ErrEval> {
                 Ok(!self)
             }
         }
@@ -158,6 +252,70 @@ macro_rules! eval_float {
         impl Eval for $i {
             type ErrEval = FloatEvalError;
 
+            fn eq(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self == other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn neq(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self != other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn gte(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self >= other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn gt(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self > other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn lte(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self <= other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn lt(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match self < other {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn and(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match (self != 0.) && (other != 0.) {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn or(self, other: Self) -> Result<Self, Self::ErrEval> {
+                match (self != 0.) || (other != 0.) {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn bit_and(self, _other: Self) -> Result<Self, Self::ErrEval> {
+                Err(FloatEvalError::UnsupportedOperation("&"))
+            }
+
+            fn bit_or(self, _other: Self) -> Result<Self, Self::ErrEval> {
+                Err(FloatEvalError::UnsupportedOperation("|"))
+            }
+
             fn add(self, other: Self) -> Result<Self, Self::ErrEval> {
                 Ok(self + other)
             }
@@ -191,6 +349,13 @@ macro_rules! eval_float {
             }
 
             fn not(self) -> Result<Self, Self::ErrEval> {
+                match self == 0. {
+                    true => Ok(1.),
+                    false => Ok(0.),
+                }
+            }
+
+            fn bit_not(self) -> Result<Self, Self::ErrEval> {
                 Err(FloatEvalError::UnsupportedOperation("!"))
             }
         }
